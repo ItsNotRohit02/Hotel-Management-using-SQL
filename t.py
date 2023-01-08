@@ -1,0 +1,3 @@
+import DatabaseHelper
+
+DatabaseHelper.createtables()
