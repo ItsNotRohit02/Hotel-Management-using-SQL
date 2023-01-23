@@ -2,13 +2,13 @@ import mysql.connector as connector
 import pandas as pd
 
 global con, cur
-con = connector.connect(host='localhost', port='3306', user='root', password='8792894300', database='hotel')
+con = connector.connect(host='localhost', port='3306', user='root', password='8792894300', database='pythontest')
 cur = con.cursor()
 
 
 def createTables():
     queries = [
-        "create table if not exists customerdetails(cid int primary key,aadhar char(20), cname char(50), cage int, phone char(20), caddress char(100), finalprice float),checkin date,checkout date",
+        "create table if not exists customerdetails(cid int primary key,aadhar char(20), cname char(50), cage int, phone char(20), caddress char(100), finalprice float, checkin date,checkout date)",
         "create table if not exists room(roomnum int primary key,roomtypeid int, size int)",
         "create table if not exists roomtype(roomtypeid int primary key,bednum int, ac char(10), rate float, description char(200))",
         "create table if not exists roomservice(orderid int primary key,itemid int, quantity int, rscid int)",
@@ -33,6 +33,7 @@ def addDefaultValues():
         "insert into bookingdetails values(1327,115,'2022-11-12','2022-11-13',1950)"]
     for query in queries:
         cur.execute(query)
+        con.commit()
         print("OK ", query)
 
 
@@ -45,6 +46,7 @@ def addForeignKeys():
         "alter table roomservice add foreign key(rscid) references customerdetails(cid)"]
     for query in queries:
         cur.execute(query)
+        con.commit()
         print("OK ", query)
 
 
@@ -133,7 +135,12 @@ def getFinalAmount(cid):
     query2 = f"select sum(items.rate * roomservice.quantity) as total_price from roomservice join items on roomservice.itemid = items.itemid where roomservice.rscid = {cid}"
     cur.execute(query2)
     for row2 in cur:
-        p2 = float(row2[0])
+        try:
+            p2 = float(row2[0])
+        except TypeError:
+            p2 =0
+        else:
+            p2 = float(row2[0])
     return p1 + p2
 
 
@@ -149,7 +156,8 @@ def selectRoom(roomtypeid, checkin, checkout):
     cur.execute(query)
     for row in cur:
         rate = int(row[0])
-    totalprice = rate * (checkout.day - checkin.day)
+    delta = checkout - checkin
+    totalprice = rate * delta.days
     return totalprice
 
 
