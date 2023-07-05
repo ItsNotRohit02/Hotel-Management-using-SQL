@@ -2,7 +2,7 @@ import mysql.connector as connector
 import pandas as pd
 
 global con, cur
-con = connector.connect(host='localhost', port='3306', user='root', password='8792894300', database='pythontest')
+con = connector.connect(host='localhost', port='3306', user='root', password='root', database='hoteldatabase')
 cur = con.cursor()
 
 
